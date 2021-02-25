@@ -1,5 +1,5 @@
-/app/mysql/
-/app/mysql/
-/app/redis/
-/app/log/
-/app/project/
+/app/mysql/*
+/app/mysql/*
+/app/redis/*
+/app/log/*
+/app/project/*
