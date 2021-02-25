@@ -1,6 +1,5 @@
-/home/andrew/www/app/mysql/
-./www/app/mysql/
-./www/app/redis/
-./www/app/log/
-./www/app/laravel/
-
+/app/mysql/
+/app/mysql/
+/app/redis/
+/app/log/
+/app/project/
