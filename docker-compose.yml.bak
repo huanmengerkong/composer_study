@@ -1,31 +1,23 @@
 version: '2.2'
 services:
     nginx:
-        hostname: nginx    
         container_name: nginx
         image: nginx
         expose:
             - "80"
         ports:
-            - "8080:80"
+            - "8099:80"
         volumes:
             - ./app/project:/var/www/html
             - ./app/config/nginx/conf.d:/etc/nginx/conf.d:rw
             - ./app/log:/var/log/nginx
         #working_dir: /app
-        #links:
-        # - fpm74:fpm74
-        depends_on:      
-            - fpm74
-        networks:
-            - fronted      
+        links:
+           - fpm74:fpm74
         command: [nginx-debug, '-g', 'daemon off;']
     fpm74:
-        hostname: fpm74
         container_name: fpm74
         build: ./fpm73-ext-docker
-        expose: 
-            - "9000"
         ports:
             - "9000:9000"
         volumes:
@@ -34,15 +26,11 @@ services:
         depends_on:
            - mysql
            - redis
-        #links:
-        #   - mysql:mysql
-        #  - redis:redis
-        #  - mongo:mongo  
-        networks:
-           - fronted
-           - backend     
+        links:
+           - mysql:mysql
+           - redis:redis
+           - mongo:mongo  
     mysql:
-       hostname: db     
        container_name: db
        image: mysql:latest
        command: --default-authentication-plugin=mysql_native_password
@@ -57,10 +45,7 @@ services:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_USER: root
           MYSQL_PASSWORD: root
-       networks:
-          - backend     
     redis:
-       hostname: redis     
        container_name: redis
        image: redis
        restart: always
@@ -71,15 +56,12 @@ services:
        volumes:
            - ./app/redis:/data
        command: redis-server --appendonly yes
-       networks:
-           - backend    
        logging:
            driver: json-file
            options:
                max-size: "200k" # 单个文件大小为200k
                max-file: "10" # 最多10个文件
     mongo:
-       hostname: mongo     
        image: mongo
        container_name: mongo_db
        restart: always
@@ -90,8 +72,6 @@ services:
        environment:
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: root
-       networks:
-          - backend     
     mongo-express:
        image: mongo-express
        restart: always
@@ -102,20 +82,11 @@ services:
           ME_CONFIG_MONGODB_ADMINPASSWORD: root           
           ME_CONFIG_BASICAUTH_USERNAME: root
           ME_CONFIG_BASICAUTH_PASSWORD: root
-      #links:
-          # - mongo:mongo        
-       networks:
-          - backend    
+       links:
+          - mongo:mongo        
     composer:
        image: composer
        container_name: composer
        command: ["composer", "install" ] #update
        volumes:
           - ./app/project:/app      
-       networks:
-          - fronted     
-networks: 
-   fronted:
-      driver: bridge     
-   backend:        
-      driver: bridge
