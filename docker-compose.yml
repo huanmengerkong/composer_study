@@ -114,6 +114,17 @@ services:
           - ./app/project:/app      
        networks:
           - fronted     
+    phpmyadmin:
+       image: phpmyadmin
+       restart: always
+       ports:
+          - 8087:80
+       depends_on:
+          - mysql    
+       environment:
+          - PMA_ARBITRARY=1        
+       networks:
+          - backend     
 networks: 
    fronted:
       driver: bridge     
