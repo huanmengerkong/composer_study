@@ -55,8 +55,9 @@ services:
            - ./app/mysql:/var/lib/mysql
        environment:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_USER: root
+          MYSQL_USER: test
           MYSQL_PASSWORD: root
+          TZ: Asia/Shanghai
        networks:
           - backend     
     redis:
@@ -82,30 +83,31 @@ services:
        hostname: mongo     
        image: mongo
        container_name: mongo_db
-       restart: always
-       expose:
-          - 27017
-       ports:
-          - "27017:27017"     
+       restart: always    
        environment:
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: root
        networks:
-          - backend     
+          - backend
+          - fronted    
     mongo-express:
        image: mongo-express
        restart: always
        ports:
           - 8081:8081
+       depends_on: 
+          - mongo   
        environment:
           ME_CONFIG_MONGODB_ADMINUSERNAME: root
           ME_CONFIG_MONGODB_ADMINPASSWORD: root           
-          ME_CONFIG_BASICAUTH_USERNAME: root
-          ME_CONFIG_BASICAUTH_PASSWORD: root
+          #ME_CONFIG_BASICAUTH_USERNAME: root
+          #ME_CONFIG_BASICAUTH_PASSWORD: root
+          ME_CONFIG_MONGODB_URL: mongodb://root:root@mongo:27017/
       #links:
           # - mongo:mongo        
        networks:
-          - backend    
+          - backend
+          - fronted    
     composer:
        image: composer
        container_name: composer
@@ -124,7 +126,24 @@ services:
        environment:
           - PMA_ARBITRARY=1        
        networks:
-          - backend     
+          - backend
+    go-dev:
+       hostname: go-dev
+       container_name: go-dev
+       build: ./go
+       expose: 
+          - 8090
+       ports:  
+          - 8090:8090
+       depends_on:
+           - mysql
+           - redis   
+       volumes: 
+          - ./app/go-www:/go-www
+       networks:    
+          - fronted  
+          - backend
+       tty: true
 networks: 
    fronted:
       driver: bridge     
