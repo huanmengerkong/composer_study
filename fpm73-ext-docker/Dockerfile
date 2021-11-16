@@ -3,16 +3,13 @@ RUN apt-get update && apt-get install -y \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libpng-dev \
-        git \
         zip \
         unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd \
-    && docker-php-ext-install mysqli \
-    && docker-php-ext-install bcmatch \
-    && docker-php-ext-install pdo \
-    && docker-php-ext-install pdo_mysql \
-RUN apt-get install -y librdkafka-dev \
+    && docker-php-ext-install -j$(nproc) gd 
+RUN apt-get install -y librdkafka-dev libmcrypt-dev \
+    && pecl install mcrypt \
+    && docker-php-ext-enable mcrypt \
     && pecl install rdkafka \
     && docker-php-ext-enable rdkafka
 COPY ./phpredis-5.3.3.tar.gz .
@@ -24,4 +21,5 @@ RUN tar -zxvf ./phpredis-5.3.3.tar.gz \
     && docker-php-ext-enable redis xdebug mongodb \
     && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \ 
     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \ 
-    && php -r "unlink('composer-setup.php');"                                             
+    && php -r "unlink('composer-setup.php');" \
+    && php -m                                            
