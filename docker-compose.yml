@@ -24,7 +24,8 @@ services:
     fpm74:
         hostname: fpm74
         container_name: fpm74
-        build: ./fpm73-ext-docker
+        #build: ./fpm73-ext-docker
+        image: registry.cn-shanghai.aliyuncs.com/huanmengerkong/fpm74:1.0
         expose: 
             - "9000"
         ports:
