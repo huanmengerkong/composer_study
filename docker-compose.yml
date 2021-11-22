@@ -7,10 +7,10 @@ services:
         expose:
             - "80"
         ports:
-            - "8080:80"
+            - "80:80"
         volumes:
             - ./app/project:/var/www/html
-            - ./app/config/nginx/conf.d:/etc/nginx/conf.d:rw
+            - ./app/config/nginx/conf.d:/etc/nginx/conf.d:ro
             - ./app/log:/var/log/nginx
         #working_dir: /app
         #links:
@@ -18,7 +18,8 @@ services:
         depends_on:      
             - fpm74
         networks:
-            - fronted      
+            - fronted
+            - backend      
         command: [nginx-debug, '-g', 'daemon off;']
     fpm74:
         hostname: fpm74
@@ -27,9 +28,10 @@ services:
         expose: 
             - "9000"
         ports:
-            - "9000:9000"
+            - "9008:9000"
         volumes:
             - ./app/project:/var/www/html
+            #- ./app/config/php/conf.d:/usr/local/etc/php
               #working_dir:  /var/www/html
         depends_on:
            - mysql
@@ -50,7 +52,7 @@ services:
        expose:
            - "3306"
        ports:
-           - "3306:3306"
+           - "3307:3306"
        volumes:
            - ./app/mysql:/var/lib/mysql
        environment:
@@ -68,12 +70,13 @@ services:
        expose:
            - "6379"
        ports:
-           - "6379:6379"
+           - "6380:6379"
        volumes:
            - ./app/redis:/data
        command: redis-server --appendonly yes
        networks:
-           - backend    
+           - backend
+           - fronted   
        logging:
            driver: json-file
            options:
@@ -87,6 +90,10 @@ services:
        environment:
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: root
+       expose: 
+          - "27017"
+       ports: 
+          - "27017:27017"
        networks:
           - backend
           - fronted    
@@ -107,15 +114,7 @@ services:
           # - mongo:mongo        
        networks:
           - backend
-          - fronted    
-    composer:
-       image: composer
-       container_name: composer
-       command: ["composer", "install" ] #update
-       volumes:
-          - ./app/project:/app      
-       networks:
-          - fronted     
+          - fronted   
     phpmyadmin:
        image: phpmyadmin
        restart: always
