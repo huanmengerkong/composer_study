@@ -2,13 +2,11 @@ FROM golang:1.17
 
 LABEL maintainer="Ving <ving@nivin.cn>"
 
-ENV GOPROXY https://goproxy.cn,direct
-
 # 安装必要的软件包和依赖包
 USER root
-RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/' /etc/apt/sources.list && \
-    sed -i 's/security.debian.org/mirrors.aliyun.com/' /etc/apt/sources.list && \
-    sed -i 's/security-cdn.debian.org/mirrors.aliyun.com/' /etc/apt/sources.list && \
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/' /etc/apt/sources.list && \
+    sed -i 's/security.debian.org/mirrors.ustc.edu.cn/' /etc/apt/sources.list && \
+    sed -i 's/security-cdn.debian.org/mirrors.ustc.edu.cn/' /etc/apt/sources.list && \
     apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
@@ -19,9 +17,13 @@ RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/' /etc/apt/sources.list && \
     vim \
     screen
 
+ENV GO111MODULE=on \
+    GOPROXY=https://goproxy.cn,direct
 # 安装 goctl
 USER root
 RUN GOPROXY=https://goproxy.cn/,direct go install github.com/zeromicro/go-zero/tools/goctl@latest
+# RUN GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go get -u github.com/zeromicro/go-zero/tools/goctl
+
 ENV GO111MODULE=on \
     GOPROXY=https://goproxy.cn,direct
 # 安装 protoc
