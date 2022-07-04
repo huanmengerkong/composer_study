@@ -3,3 +3,5 @@
 /app/log/
 **/project/*
 !**/project/test
+.idea/
+code/
